@@ -20,7 +20,6 @@ from taxifare.ml_logic.params import (
     LOCAL_DATA_PATH
 )
 
-
 def preprocess_and_train():
     """
     Load historical data in memory, clean and preprocess it, train a Keras model on it,
@@ -36,21 +35,30 @@ def preprocess_and_train():
     data = pd.read_csv(data_raw_path, dtype=DTYPES_RAW_OPTIMIZED)
 
     # Clean data using ml_logic.data.clean_data
-    # YOUR CODE HERE
+    clean_df = clean_data(data)
+
 
     # Create X, y
-    # YOUR CODE HERE
+    X = clean_df.drop("fare_amount", axis=1)
+    y = clean_df[["fare_amount"]]
 
     # Preprocess X using `preprocessor.py`
-    # YOUR CODE HERE
+    X_processed = preprocess_features(X)
 
     # Train model on X_processed and y, using `model.py`
-    model = None
+    model = initialize_model(X = X_processed)
     learning_rate = 0.001
     batch_size = 256
     patience = 2
 
-    # YOUR CODE HERE
+    model = compile_model(model, learning_rate=learning_rate)
+
+    model, history = train_model(model = model,
+                                X=X_processed,
+                                y=y,
+                                batch_size = batch_size,
+                                patience = 2)
+
 
     # Compute the validation metric (min val mae of the holdout set)
     metrics = dict(mae=np.min(history.history['val_mae']))
@@ -86,10 +94,12 @@ def pred(X_pred: pd.DataFrame = None) -> np.ndarray:
     model = load_model()
 
     # Preprocess the new data
-    # YOUR CODE HERE
+    X_pred_processed = preprocess_features(X_pred)
+
 
     # Make a prediction
-    # YOUR CODE HERE
+    y_pred = model.predict(X_pred_processed)
+    y_pred.shape
 
     # 🧪 Write outputs so that they can be tested by make test_train_at_scale (do not remove)
     write_result(name="test_pred", subdir="train_at_scale", y_pred=y_pred)

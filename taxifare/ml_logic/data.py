@@ -15,13 +15,21 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     # remove useless/redundant columns
-    # YOUR CODE HERE
+    df = df.drop(columns=['key'])
+    df = df.drop_duplicates()
+    df = df.dropna(how='any', axis=0)
+
 
     # remove buggy transactions
-    # YOUR CODE HERE
+    df = df[(df.dropoff_latitude != 0)]
+    df = df[df.passenger_count > 0]
+    df = df[df.fare_amount > 0]
 
     # remove irrelevant/non-representative transactions (rows) for a training set
-    # YOUR CODE HERE
+    df = df[df["pickup_latitude"].between(left=40.5, right=40.9)]
+    df = df[df["dropoff_latitude"].between(left=40.5, right=40.9)]
+    df = df[df["pickup_longitude"].between(left=-74.3, right=-73.7)]
+    df = df[df["dropoff_longitude"].between(left=-74.3, right=-73.7)]
 
     print("\n✅ data cleaned")
 
